@@ -1,6 +1,9 @@
-import Phonebook from "./Phonebook/Phonebook";
+import FindImage from "./FindImage/FindImage";
 
 export const App = () => {
+  
+
+
   return (
     <div
       style={{
@@ -13,7 +16,8 @@ export const App = () => {
         textAlign: 'center'
       }}
     >
-      <Phonebook />
+      <FindImage />
+      
     </div>
   );
 };
