@@ -1,6 +1,6 @@
 Project made as part of the course [FULLSTACK PROGRAMISTA OD ZERA](https://goit.global/pl/courses/fullstackonline/?utm_source=main-site) from GOIT.
 
-=> [Strona projektu](https://marektg.github.io/goit-react-hw-02-phonebook/)
+=> [Strona projektu](https://marektg.github.io/goit-react-hw-03-image-finder/)
 
 Technologies used:
 

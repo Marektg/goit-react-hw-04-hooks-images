@@ -1,17 +1,22 @@
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import ImageGalleryItem from "../ImageGalleryItem/ImageGalleryItem"
+import React from 'react';
+import PropTypes from 'prop-types';
+import styles from './ImageGallery.module.scss';
+import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
+import { nanoid } from 'nanoid';
 
-export class ImageGallery extends Component {
-  static propTypes = {}
+export const ImageGallery = ({ items, openModal }) => {
+  const { gallery } = styles;
 
-  render() {
-    return (
-        <ul class="gallery">
-            <ImageGalleryItem />
-        </ul>
-    )
-  }
+  return (
+    <ul className={gallery}>
+      {items.map(item => <ImageGalleryItem key={nanoid()} itemData={item} openModal={openModal} />)}
+    </ul>
+  )
 }
 
-export default ImageGallery
+ImageGallery.propTypes = {
+  items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  openModal: PropTypes.func.isRequired,
+}
+
+export default ImageGallery;
