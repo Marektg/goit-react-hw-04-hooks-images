@@ -1,121 +1,103 @@
-import React, { Component } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from './App.module.scss';
 import Notiflix from 'notiflix';
 import 'notiflix/dist/notiflix-3.2.5.min.css';
 import { fetchImages } from '../service/fetchImage';
-import { Searchbar } from './Searchbar/Searchbar';
-import { ImageGallery } from './ImageGallery/ImageGallery';
-import { Button } from './Button/Button';
-import { Loader } from './Loader/Loader';
-import { Modal } from './Modal/Modal';
+import Searchbar from './Searchbar/Searchbar';
+import  ImageGallery  from './ImageGallery/ImageGallery';
+import  Button  from './Button/Button';
+import  Loader  from './Loader/Loader';
+import Modal from './Modal/Modal';
 
 
-export class App extends Component {
-  state = {
-    images: [],
-    searchWord: '',
-    page: 1,
-    isLoading: false,
-    error: null,
-    foundImages: null,
-    currentLargeImg: null,
-  }
 
-  setInitialParams = (searchWord) => {
-    if (searchWord === '') {
-      return Notiflix.Notify.failure("Enter the search value!"); 
-      };
-    
+const App = () => {
+  const [images, setImages] = useState([]);
+  const [searchWord, setSearchWord] = useState("");
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [totalImages, setTotalImages] = useState(0);
+  const [currentLargeImg, setCurrentLargeImg] = useState(null);
 
-    if (searchWord === this.state.searchWord) {
+  const setInitialParams = (word) => {
+    if (word === "") {
+      Notiflix.Notify.failure("Enter the search value!");
       return;
     }
 
-    this.setState({
-      images: [],
-      searchWord,
-      page: 1,
-    });
+    if (word === searchWord) {
+      return;
+    }
+
+    setImages([]);
+    setSearchWord(word);
+    setPage(1);
   }
 
-  loadMore = () => {
-    this.setState(({ page }) => ({ page: page + 1 }));
+  const loadMore = () => {
+    setPage(page + 1);
   }
 
-  addImages = async (searchWord, page) => {
-    this.setState({ isLoading: true });
+  const addImages = useCallback(async () => {
+    setIsLoading(true);
 
     try {
-      const data = await fetchImages(searchWord, page);
+      if (!searchWord) {
+        return;
+      }
+
+      const data =await fetchImages(searchWord, page);
       const { hits: newImages, totalHits: foundImages } = data;
 
-      this.setState(oldState => ({
-        images: [...oldState.images, ...newImages],
-      }));
-
-      if (foundImages !== this.state.foundImages) {
-        this.setState({ foundImages });
-      };
-    
+      setImages(oldImages => [...oldImages, ...newImages]);
+      setTotalImages(foundImages);
       if (newImages.length === 0) {
         Notiflix.Notify.failure("Sorry, there are no images matching your search word. Please try again.");
       } 
-    } catch (error) {
-      this.setState({ error })
+    } catch (err) {
+      setError(err);
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
+  }, [searchWord, page],
+)
+
+
+  const openModal = (src, alt) => {
+    setCurrentLargeImg({ src, alt });
   }
 
-  openModal = (srcLargeImg, altInfo) => {
-    this.setState({
-      currentLargeImg: {
-        src: srcLargeImg,
-        alt: altInfo,
+  const closeModal = (evt) => {
+    setCurrentLargeImg(null);
+  }
+
+  useEffect(() => {
+    addImages();
+  }, [addImages]);
+
+  const { app, notification } = styles;
+
+  return (
+    <div className={app}>
+      <Searchbar onSubmit={setInitialParams} />
+      {error && <p className={notification}>Whoops, something went wrong: {error.message}</p>}
+      {isLoading && <Loader />}
+      {images.length > 0 &&
+        <>
+          <ImageGallery
+            items={images}
+            openModal={openModal}
+          />
+          {images.length < totalImages &&
+            <Button loadMore={loadMore} />
+          }
+        </>
       }
-    });
-  }
-
-  closeModal = (evt) => {
-    this.setState({ currentLargeImg: null });
-  }
-
-  componentDidUpdate(_, prevState) {
-    if (prevState.page !== this.state.page || prevState.searchWord !== this.state.searchWord) {
-      const { searchWord, page } = this.state;
-      this.addImages(searchWord, page);
-    }
-  }
- 
-
-
-
-  render() {
-    const { app } = styles;
-    const { images, isLoading, error, foundImages, currentLargeImg } = this.state;
-
-    return (
-      <div className={app}>
-        <Searchbar onSubmit={this.setInitialParams} />
-        {isLoading && <Loader />}
-        {error && <p>Whoops, something went wrong: {error.message}</p>}
+      {currentLargeImg && <Modal closeModal={closeModal} imgData={currentLargeImg} />}
       
-        {images.length !== 0 &&
-          <>
-            <ImageGallery
-              items={images}
-              openModal={this.openModal}
-            />
-            {images.length < foundImages &&
-              <Button loadMore={this.loadMore} />
-            }
-          </>
-        }
-        
-        {currentLargeImg && <Modal closeModal={this.closeModal} imgData={currentLargeImg} />}
-      </div>
-    );
-  }
-};
+    </div>
+  );
+}
 
 export default App;
