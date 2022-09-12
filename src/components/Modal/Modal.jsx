@@ -23,18 +23,18 @@ const Modal = ({ imgData, closeModal }) => {
         }
     }, [closeModal])
 
-        const { overlay, modal } = styles;
-        
-        const { src, alt } = imgData;
+    const { overlay, modal } = styles;
 
-        return (
-            <div className={overlay} onClick={handleOverlayClick}>
-                <div className={modal}>
-                    <img src={src} alt={alt} />
-                </div>
+    const { src, alt } = imgData;
+
+    return (
+        <div className={overlay} onClick={handleOverlayClick}>
+            <div className={modal}>
+                <img src={src} alt={alt} />
             </div>
-        )
-    
+        </div>
+    )
+
 }
 Modal.propTypes = {
     closeModal: PropTypes.func.isRequired,

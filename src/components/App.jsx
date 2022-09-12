@@ -4,9 +4,9 @@ import Notiflix from 'notiflix';
 import 'notiflix/dist/notiflix-3.2.5.min.css';
 import { fetchImages } from '../service/fetchImage';
 import Searchbar from './Searchbar/Searchbar';
-import  ImageGallery  from './ImageGallery/ImageGallery';
-import  Button  from './Button/Button';
-import  Loader  from './Loader/Loader';
+import ImageGallery from './ImageGallery/ImageGallery';
+import Button from './Button/Button';
+import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';
 
 
@@ -47,21 +47,21 @@ const App = () => {
         return;
       }
 
-      const data =await fetchImages(searchWord, page);
+      const data = await fetchImages(searchWord, page);
       const { hits: newImages, totalHits: foundImages } = data;
 
       setImages(oldImages => [...oldImages, ...newImages]);
       setTotalImages(foundImages);
       if (newImages.length === 0) {
         Notiflix.Notify.failure("Sorry, there are no images matching your search word. Please try again.");
-      } 
+      }
     } catch (err) {
       setError(err);
     } finally {
       setIsLoading(false);
     }
   }, [searchWord, page],
-)
+  )
 
 
   const openModal = (src, alt) => {
@@ -95,7 +95,7 @@ const App = () => {
         </>
       }
       {currentLargeImg && <Modal closeModal={closeModal} imgData={currentLargeImg} />}
-      
+
     </div>
   );
 }
